@@ -130,7 +130,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
             if(elem.getKind() != ElementKind.CLASS) {
                 error("This annotation can only be applied to a class");
             } else {
-                models.add(extractModel(elem));
+                models.add(extractActivityModel(elem));
                 return models;
             }
         }
@@ -138,7 +138,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
         return null;
     }
 
-    private MingleActivityModel extractModel(Element elem) {
+    private MingleActivityModel extractActivityModel(Element elem) {
         String packageName = elementUtils.getPackageOf(elem).getQualifiedName().toString();
 
         String baseComponentName = extractBaseComponentName(elem.getAnnotationMirrors());
