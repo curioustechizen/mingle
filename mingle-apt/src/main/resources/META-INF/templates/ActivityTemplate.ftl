@@ -1,6 +1,4 @@
-<#macro instanceVariable theClass>
-m${theClass.name?cap_first}
-</#macro>
+<#macro instanceVariable theClass>m${theClass.name?cap_first}</#macro>
 
 package ${generatedComponent.packageName};
 
