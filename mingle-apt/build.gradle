@@ -1,0 +1,18 @@
+apply plugin: 'java'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':mingle-api')
+    compile 'org.freemarker:freemarker:2.3.20'
+    //compile 'org.apache.logging.log4j:log4j:2.0.+'
+    //compile 'org.apache.logging.log4j:log4j-api:2.0.+'
+    //compile 'org.apache.logging.log4j:log4j-core:2.0.+'
+    compile 'log4j:log4j:1.2.17'
+}
