@@ -1,6 +1,7 @@
 #Mingle
 
 `mingle` is a **mixin library** with the goal of reducing boilerplate code in Android applications. It achieves this goal using **compile time annotation processing**. `mingle` promotes the "Favor composition over Inheritance" advice by turning each mixin into an member variable of a class.
+`mingle` is currently **pre-alpha**. I'm looking for feedback (in terms of the approach I'm using) as well as code contributions.
 
 ###Basic usage
 
@@ -32,11 +33,14 @@ Using Mingle, you can do this:
 
 ```java
 public class EventBusMixin {
+
     private EventBus mBus;
-    private WeakReference<Activity > mOwnerActivityRef;
+    private WeakReference<Activity> mOwnerActivityRef;
+
     public EventBusMixin(Activity owner){
         mOwnerActivityRef = new WeakReference<Activity>(owner);
     }
+
     public void onCreate(Bundle savedInstanceState) {
         mBus = EventBus.getInstance(mOwnerActivityRef.get());
     }
@@ -102,7 +106,7 @@ public class MyListActivity {
 }
 ```
 
-###Comparison to other similar libraries
+###Comparison to other boilerplate-elimination libraries for Android
 
   - Since Java annotation processing does not allow editing source code (at least not without hacks of the kind used in [Project Lombok](http://projectlombok.org/)), this library is *not* a 100% transparent to the developer. This means, as a developer you need to manually point to the generated files in your code. This is similar to the approach followed by [AndroidAnnotations](https://github.com/excilys/androidannotations/).
   - If you wish to eliminate these steps entirely, you could look at byte-code manipulation using javassist - in particular check out [Mimic by Stephane Nicolas](https://github.com/stephanenicolas/mimic). Note however that you will lose the ability to step-debug through generated code if you use byte code manipulation. One could argue that generated code should be of such a quality that a developer should never have to debug it - but well ...
