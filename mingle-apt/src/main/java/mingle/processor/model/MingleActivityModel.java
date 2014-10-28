@@ -9,11 +9,17 @@ public class MingleActivityModel {
     private final ClassModel generatedComponent;
     private final ClassModel baseComponent;
     private final List<ClassModel> mixinClasses;
+    private final ClassModel principalClass;
 
-    public MingleActivityModel(ClassModel generatedComponent, ClassModel baseComponent, List<ClassModel> mixinClasses) {
+    public MingleActivityModel(ClassModel principalClass, ClassModel generatedComponent, ClassModel baseComponent, List<ClassModel> mixinClasses) {
         this.generatedComponent = generatedComponent;
         this.baseComponent = baseComponent;
         this.mixinClasses = mixinClasses;
+        this.principalClass = principalClass;
+    }
+
+    public ClassModel getPrincipalClass(){
+        return this.principalClass;
     }
 
     public ClassModel getGeneratedComponent() {

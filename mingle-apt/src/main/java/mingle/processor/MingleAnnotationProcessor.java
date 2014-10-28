@@ -125,17 +125,17 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
     private List<MingleActivityModel> parseMingleActivityAnnotations(RoundEnvironment roundEnv) {
 
         Set<? extends Element> elementsAnnotatedWithElem = roundEnv.getElementsAnnotatedWith(MingleActivity.class);
+        //info(String.format("elementsAnnotatedWithElem.size = %d", elementsAnnotatedWithElem.size()));
         List<MingleActivityModel> models = new ArrayList<MingleActivityModel>(elementsAnnotatedWithElem.size());
         for(Element elem: elementsAnnotatedWithElem){
             if(elem.getKind() != ElementKind.CLASS) {
                 error("This annotation can only be applied to a class");
             } else {
                 models.add(extractActivityModel(elem));
-                return models;
             }
         }
 
-        return null;
+        return models;
     }
 
     private MingleActivityModel extractActivityModel(Element elem) {
@@ -144,9 +144,10 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
         String baseComponentName = extractBaseComponentName(elem.getAnnotationMirrors());
         List<ClassModel> mixinClasses = extractMixinClassNames(elem.getAnnotationMirrors());
 
+        final ClassModel principalClass = new ClassModel(packageName, elem.getSimpleName().toString());
         final ClassModel baseComponent = new ClassModel(baseComponentName);
         final ClassModel generatedComponent = new ClassModel(packageName, elem.getSimpleName()+"_");
-        return new MingleActivityModel(generatedComponent, baseComponent, mixinClasses);
+        return new MingleActivityModel(principalClass, generatedComponent, baseComponent, mixinClasses);
     }
 
     private String extractBaseComponentName(List<? extends AnnotationMirror> annotationMirrors) {
