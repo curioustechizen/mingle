@@ -30,6 +30,7 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.Version;
 import mingle.annotations.MingleActivity;
 import mingle.processor.model.ClassModel;
@@ -76,6 +77,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
 // Sets how errors will appear. Here we assume we are developing HTML pages.
 // For production systems TemplateExceptionHandler.RETHROW_HANDLER is better.
         //cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+        //mFreemarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
 
 
         mFreemarkerConfiguration.setIncompatibleImprovements(new Version(2, 3, 20));
@@ -92,7 +94,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
+        return SourceVersion.RELEASE_7;
     }
 
     @Override
@@ -146,7 +148,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
 
         final ClassModel principalClass = new ClassModel(packageName, elem.getSimpleName().toString());
         final ClassModel baseComponent = new ClassModel(baseComponentName);
-        final ClassModel generatedComponent = new ClassModel(packageName, elem.getSimpleName()+"_");
+        final ClassModel generatedComponent = new ClassModel(packageName, elem.getSimpleName()+"Activity_");
         return new MingleActivityModel(principalClass, generatedComponent, baseComponent, mixinClasses);
     }
 
@@ -157,7 +159,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
             for(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry: elementValues.entrySet()){
                 String key = entry.getKey().getSimpleName().toString();
                 String value = entry.getValue().getValue().toString();
-                info(String.format("Key = %s; Value = %s", key, value));
+                //info(String.format("Key = %s; Value = %s", key, value));
                 if(ANNOTATION_METHOD_NAME_BASE.equals(key)){
                     return value;
                 }
@@ -171,7 +173,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor{
 
         for(AnnotationMirror mirror: annotationMirrors){
             Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = mirror.getElementValues();
-            info("In extractMixinClassNames, elementValues="+elementValues.toString());
+            //info("In extractMixinClassNames, elementValues="+elementValues.toString());
             for(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry: elementValues.entrySet()){
                 if(ANNOTATION_METHOD_NAME_MIXINS.equals(entry.getKey().getSimpleName().toString())){
                     List<AnnotationValue> vals = (List<AnnotationValue>)entry.getValue().getValue();
