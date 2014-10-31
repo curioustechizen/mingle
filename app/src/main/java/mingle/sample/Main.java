@@ -8,7 +8,7 @@ import mingle.annotations.MingleActivity;
 import mingle.sample.misc.EventbusMixin;
 
 @MingleActivity(base = Activity.class, mixins = {WifiMixin.class, EventbusMixin.class})
-public class MainActivity {
+public class Main {
     public void onCreate(Bundle savedInstanceState) {
 
     }

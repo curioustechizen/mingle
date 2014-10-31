@@ -9,7 +9,7 @@ import mingle.annotations.MingleActivity;
 import mingle.sample.misc.EventbusMixin;
 
 @MingleActivity(base = ListActivity.class, mixins = {WifiMixin.class})
-public class MyListActivity {
+public class MyList {
     public void onCreate(Bundle savedInstanceState) {
 
     }

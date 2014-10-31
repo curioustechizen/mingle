@@ -6,6 +6,12 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
 
+        <activity android:name=".sample.MainActivity_">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+                <category android:name="android.intent.category.LAUNCHER"></category>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
