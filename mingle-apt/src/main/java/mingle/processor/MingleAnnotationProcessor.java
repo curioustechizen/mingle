@@ -36,7 +36,7 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.Version;
-import mingle.annotations.Mingle;
+import mingle.Mingle;
 import mingle.annotations.MingleActivity;
 import mingle.annotations.MingleFragment;
 import mingle.annotations.OnCreate;
@@ -70,7 +70,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
     public static final Set<String> FRAGMENT_LIFECYCLE_METHOD_NAMES = new HashSet<String>();
     static {
         final Set<String> COMMON_LIFECYCLE_METHODS = new HashSet<String>();
-        Collections.addAll(COMMON_LIFECYCLE_METHODS, "onCreate", "onStart", "onResume", "onPause", "onStop", "onDestroy", "onSaveInstanceState", "onCreateOptionsMenu", "onPrepareOptionsMenu", "onOptionsItemSelected");
+        Collections.addAll(COMMON_LIFECYCLE_METHODS, "onCreate", "onStart", "onResume", "onPause", "onStop", "onDestroy", "onSaveInstanceState");
         ACTIVITY_LIFECYCLE_METHOD_NAMES.addAll(COMMON_LIFECYCLE_METHODS);
         FRAGMENT_LIFECYCLE_METHOD_NAMES.addAll(COMMON_LIFECYCLE_METHODS);
         Collections.addAll(FRAGMENT_LIFECYCLE_METHOD_NAMES, "onAttach", "onActivityCreated", "onCreateView", "onViewCreated", "onDetach");
@@ -115,7 +115,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
         mSupportedAnnotationClasses.addAll(mSupportedTopLevelAnnotationClasses);
         mSupportedAnnotationClasses.addAll(mSupportedMethodLevelAnnotationClasses);
 
-        mAnnotationsToElementsMap = new HashMap<Class, Set<? extends Element>>(getSupportedAnnotationTypes().size());
+        mAnnotationsToElementsMap = new HashMap<Class, Set<? extends Element>>(mSupportedAnnotationClasses.size());
     }
 
     private Configuration initializeFreemarkerConfiguration() {
@@ -156,9 +156,9 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
         if(!roundEnv.processingOver()) {
             for (Class<? extends Annotation> type : mSupportedAnnotationClasses) {
                 mAnnotationsToElementsMap.put(type, roundEnv.getElementsAnnotatedWith(type));
-                processMingleActivities();
                 //processMingleFragments();
             }
+            processMingleActivities();
         }
         return false;
     }
@@ -194,8 +194,9 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
     }
 
     private void emitActivity(MingleActivityModel model) throws IOException, TemplateException {
-        final Template activityTemplate = mFreemarkerConfiguration.getTemplate("ActivityTemplateAdvanced.ftl");
-        final JavaFileObject generatedActivity = filer.createSourceFile(model.getGeneratedComponent().getFullyQualifiedName(), model.getOriginatingElements());
+        //info(String.format("Emitting Activity for\n%s", model.toString()));
+        final Template activityTemplate = mFreemarkerConfiguration.getTemplate("ActivityTemplate.ftl");
+        final JavaFileObject generatedActivity = filer.createSourceFile(model.getGeneratedComponent().getFqcn(), model.getOriginatingElements());
         Writer writer = generatedActivity.openWriter();
         activityTemplate.process(model, writer);
         writer.close();
@@ -224,7 +225,7 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
 
     private void addStatementsForMixinClasses(MingleActivityModel activityModel, List<ClassModel> mixinClasses) {
         for(ClassModel mixin: mixinClasses){
-            TypeElement mixinElement = elementUtils.getTypeElement(mixin.getFullyQualifiedName());
+            TypeElement mixinElement = elementUtils.getTypeElement(mixin.getFqcn());
             if(mixinElement != null){
                 List<ExecutableElement> mixinMethods = ElementFilter.methodsIn(mixinElement.getEnclosedElements());
                 addMixinStatements(activityModel, mixin, mixinMethods);
@@ -234,12 +235,12 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
 
     private void addMixinStatements(MingleActivityModel activityModel, ClassModel classModel, List<ExecutableElement> methods) {
         for(ExecutableElement aMethod: methods){
-            if(ACTIVITY_LIFECYCLE_METHOD_NAMES.contains(aMethod.getSimpleName())){
+            if(ACTIVITY_LIFECYCLE_METHOD_NAMES.contains(aMethod.getSimpleName().toString())){
                 activityModel.addMixinStatement(
                         aMethod.getSimpleName().toString(),
                         new MixinStatement(
-                                classModel.getFullyQualifiedName(),
-                                NameUtils.variableNameForClass(classModel.getFullyQualifiedName()),
+                                classModel.getFqcn(),
+                                classModel.getVariableName(),
                                 Mingle.ORDER_DEFAULT));
             }
         }
@@ -299,22 +300,19 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
 
     private void emitFragment(MingleFragmentModel model) throws IOException, TemplateException {
         final Template fragmentTemplate = mFreemarkerConfiguration.getTemplate("FragmentTemplate.ftl");
-        final JavaFileObject generatedFragment = filer.createSourceFile(model.getGeneratedComponent().getFullyQualifiedName(), model.getOriginatingElements());
+        final JavaFileObject generatedFragment = filer.createSourceFile(model.getGeneratedComponent().getFqcn(), model.getOriginatingElements());
         Writer writer = generatedFragment.openWriter();
         fragmentTemplate.process(model, writer);
         writer.close();
     }
 
     private String extractBaseComponentName(List<? extends AnnotationMirror> annotationMirrors) {
-
         for (AnnotationMirror mirror : annotationMirrors) {
             Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = mirror.getElementValues();
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : elementValues.entrySet()) {
                 String key = entry.getKey().getSimpleName().toString();
                 String value = entry.getValue().getValue().toString();
-                //info(String.format("Key = %s; Value = %s", key, value));
                 if (ANNOTATION_METHOD_NAME_BASE.equals(key)) {
-
                     return value;
                 }
             }
@@ -324,10 +322,8 @@ public class MingleAnnotationProcessor extends AbstractProcessor {
     }
 
     private List<ClassModel> extractMixinClassNames(List<? extends AnnotationMirror> annotationMirrors) {
-
         for (AnnotationMirror mirror : annotationMirrors) {
             Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = mirror.getElementValues();
-            //info("In extractMixinClassNames, elementValues="+elementValues.toString());
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : elementValues.entrySet()) {
                 if (ANNOTATION_METHOD_NAME_MIXINS.equals(entry.getKey().getSimpleName().toString())) {
                     List<AnnotationValue> vals = (List<AnnotationValue>) entry.getValue().getValue();

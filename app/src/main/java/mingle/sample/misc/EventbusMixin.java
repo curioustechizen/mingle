@@ -4,10 +4,15 @@ package mingle.sample.misc;
 import android.app.Activity;
 import android.os.Bundle;
 
+import mingle.Mingle;
+import mingle.annotations.OnPause;
+import mingle.annotations.OnResume;
+
 public class EventbusMixin {
 
     public EventbusMixin(Activity activity){}
 
+    @OnResume(order = Mingle.ORDER_END)
     public void onResume(){
         registerBus();
     }
@@ -16,6 +21,7 @@ public class EventbusMixin {
 
     }
 
+    @OnPause(order = Mingle.ORDER_BEGINNING)
     public void onPause(){
         unregisterBus();
     }
@@ -23,9 +29,4 @@ public class EventbusMixin {
     private void unregisterBus() {
 
     }
-
-
-    public void onStart(){}
-    public void onStop(){}
-
 }

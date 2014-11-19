@@ -1,24 +1,30 @@
 package mingle.processor.model;
 
 
+import mingle.processor.util.NameUtils;
+
 public class ClassModel {
     private final String name;
     private final String packageName;
-    private final String fullyQualifiedName;
+    private final String fqcn;
+    private final String variableName;
     //private boolean onCreate = true, onStart = true, onResume = false, onPause = false, onDestroy = true, onStop = true, onSaveInstanceState = true;
 
     public ClassModel(String fqName) {
-        this.fullyQualifiedName = fqName;
+        this.fqcn = fqName;
         int lastDot = fqName.lastIndexOf(".");
-        this.packageName = fqName.substring(0, lastDot - 1);
+        this.packageName = fqName.substring(0, lastDot);
         this.name = fqName.substring(lastDot + 1);
+        this.variableName = NameUtils.variableNameForClass(this.fqcn);
     }
 
     public ClassModel(String packageName, String name) {
         this.packageName = packageName;
         this.name = name;
-        this.fullyQualifiedName = this.packageName + "." + this.name;
+        this.fqcn = this.packageName + "." + this.name;
+        this.variableName = NameUtils.variableNameForClass(this.fqcn);
     }
+
 
     /*public boolean getOnCreate() {
         return onCreate;
@@ -56,7 +62,11 @@ public class ClassModel {
         return packageName;
     }
 
-    public String getFullyQualifiedName() {
-        return fullyQualifiedName;
+    public String getFqcn() {
+        return fqcn;
+    }
+
+    public String getVariableName(){
+        return this.variableName;
     }
 }
