@@ -29,7 +29,7 @@ public class ${generatedComponent.name} extends ${baseComponent.fullyQualifiedNa
          <@instanceVariable theClass=mixinClass/>.onCreate(savedInstanceState$$0);
         }
         </#if>
-</#list>
+        </#list>
     }
 
     <#assign lifeCycleMethodsWithoutParams = ["onStart", "onResume", "onPause", "onStop", "onDestroy"]>

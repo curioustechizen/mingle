@@ -15,10 +15,6 @@ class WifiMixin {
     void onCreate(Bundle savedInstanceState){}
     void onPause(){}
     void onResume(){}
-    void onStart(){}
-    void onStop(){}
-    void onSaveInstanceState(Bundle outState){}
-
     void onDestroy(){
         mActivityRef.clear();
     }

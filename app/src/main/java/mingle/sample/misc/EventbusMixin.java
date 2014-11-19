@@ -24,9 +24,8 @@ public class EventbusMixin {
 
     }
 
-    public void onCreate(Bundle savedInstanceState){}
+
     public void onStart(){}
     public void onStop(){}
-    public void onSaveInstanceState(Bundle outState){}
-    public void onDestroy(){}
+
 }

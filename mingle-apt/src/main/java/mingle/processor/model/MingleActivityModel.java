@@ -1,40 +1,28 @@
 package mingle.processor.model;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.Element;
 
-public class MingleActivityModel {
-    private final ClassModel generatedComponent;
-    private final ClassModel baseComponent;
-    private final List<ClassModel> mixinClasses;
-    private final ClassModel principalClass;
+import mingle.annotations.Mingle;
+import mingle.processor.MingleAnnotationProcessor;
+
+public class MingleActivityModel extends AbstractMingleComponentModel {
 
     public MingleActivityModel(ClassModel principalClass, ClassModel generatedComponent, ClassModel baseComponent, List<ClassModel> mixinClasses) {
-        this.generatedComponent = generatedComponent;
-        this.baseComponent = baseComponent;
-        this.mixinClasses = mixinClasses;
-        this.principalClass = principalClass;
+        super(baseComponent, principalClass, generatedComponent, mixinClasses);
+        for(String lifecycleMethodName: MingleAnnotationProcessor.ACTIVITY_LIFECYCLE_METHOD_NAMES){
+            MixinStatement superStatement = new MixinStatement(null, "super", Mingle.ORDER_DEFAULT);
+            List<MixinStatement> statementList = new ArrayList<MixinStatement>();
+            statementList.add(superStatement);
+            mLifecycleStatementMap.put(lifecycleMethodName, statementList);
+        }
+
     }
 
-    public ClassModel getPrincipalClass(){
-        return this.principalClass;
-    }
-
-    public ClassModel getGeneratedComponent() {
-        return generatedComponent;
-    }
-
-    public ClassModel getBaseComponent() {
-        return baseComponent;
-    }
-
-    public List<ClassModel> getMixinClasses() {
-        return mixinClasses;
-    }
-
-    public Element getOriginatingElements() {
-        return null;
-    }
 }
