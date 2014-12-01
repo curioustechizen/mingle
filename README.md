@@ -32,34 +32,60 @@ But then, what if one of the Activities in your app needs to extend `ListActivit
 Using Mingle, you can do this:
 
 ```java
-public class EventBusMixin {
+@MingleActivity(base = Activity.class, mixins = {WifiMixin.class, EventbusMixin.class})
+public class Main {
 
-    private EventBus mBus;
-    private WeakReference<Activity> mOwnerActivityRef;
+    public Main(Activity owner){}
 
-    public EventBusMixin(Activity owner){
-        mOwnerActivityRef = new WeakReference<Activity>(owner);
-    }
-
-    public void onCreate(Bundle savedInstanceState) {
-        mBus = EventBus.getInstance(mOwnerActivityRef.get());
-    }
-
-    public void onStart(){
-        mBus.register(mOwnerActivityRef.get());
-    }
-
-    public void onStop(){
-        mBus.unregister(mOwnerActivityRef.get());
-    }
-
-    public void onDestroy(){
-        mOwnerActivityRef.clear();
+    @OnCreate
+    public void onCreate(Bundle savedInstanceState){
+        //Do Some Creating
     }
 }
 
-@MingleActivity(base = Activity.class, mixins = {EventBusMixin.class})
-public class MyActivity {
+class WifiMixin {
+
+    private WeakReference<Activity> mActivityRef;
+
+    WifiMixin(Activity mOwner){
+        mActivityRef = new WeakReference<Activity>(mOwner);
+    }
+
+    @OnPause(order = Mingle.ORDER_AFTER_SUPER)
+    void onPause(){}
+
+    @OnResume(order = Mingle.ORDER_AFTER_SUPER)
+    void onResume(){}
+
+    @OnDestroy
+    void onDestroy(){
+        mActivityRef.clear();
+    }
+
+}
+
+
+public class EventbusMixin {
+
+    public EventbusMixin(Activity activity){}
+
+    @OnResume(order = Mingle.ORDER_END)
+    public void onResume(){
+        registerBus();
+    }
+
+    private void registerBus() {
+        //Register with the bus here
+    }
+
+    @OnPause(order = Mingle.ORDER_BEGINNING)
+    public void onPause(){
+        unregisterBus();
+    }
+
+    private void unregisterBus() {
+        //Unregister from the bus here
+    }
 }
 ```
 
@@ -68,33 +94,45 @@ This will generate the following:
 ```java
 public class MainActivity_ extends android.app.Activity {
 
-    private mingle.sample.EventBusMixin mEventbusMixin;
+    private mingle.sample.Main __mingle_mingle_sample_Main_$$22;
+    private mingle.sample.WifiMixin __mingle_mingle_sample_WifiMixin_$$138;
+    private mingle.sample.misc.EventbusMixin __mingle_mingle_sample_misc_EventbusMixin_$$191;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if(mEventbusMixin == null) {
-            mEventbusMixin = new mingle.sample.EventBusMixin(this);
-        } else {
-            mEventbusMixin.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState$$0) {
+        if(__mingle_mingle_sample_Main_$$22 == null){
+            __mingle_mingle_sample_Main_$$22 = new mingle.sample.Main();
         }
+        if(__mingle_mingle_sample_WifiMixin_$$138 == null){
+            __mingle_mingle_sample_WifiMixin_$$138 = new mingle.sample.WifiMixin(this);
+        }
+        if(__mingle_mingle_sample_misc_EventbusMixin_$$191 == null){
+            __mingle_mingle_sample_misc_EventbusMixin_$$191 = new mingle.sample.misc.EventbusMixin(this);
+        }
+        super.onCreate(savedInstanceState$$0);
+        __mingle_mingle_sample_Main_$$22.onCreate(savedInstanceState$$0);
     }
 
-    protected void onStart() {
-        super.onStart();
-        mEventbusMixin.onStart();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        __mingle_mingle_sample_WifiMixin_$$138.onResume();
+        __mingle_mingle_sample_misc_EventbusMixin_$$191.onResume();
     }
 
-    protected void onStop() {
-        super.onStop();
-        mEventbusMixin.onStop();
+    @Override
+    protected void onPause() {
+        __mingle_mingle_sample_misc_EventbusMixin_$$191.onPause();
+        super.onPause();
+        __mingle_mingle_sample_WifiMixin_$$138.onPause();
+
     }
 
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mEventbusMixin.onDestroy();
+        __mingle_mingle_sample_WifiMixin_$$138.onDestroy();
     }
-
 }
 ```
 
@@ -102,7 +140,8 @@ if you want your Activity to extend from another base Activity, just change the 
 
 ```java
 @MingleActivity(base = ListActivity.class, mixins = {EventBusMixin.class})
-public class MyListActivity {
+public class MyList{
+    // ...
 }
 ```
 

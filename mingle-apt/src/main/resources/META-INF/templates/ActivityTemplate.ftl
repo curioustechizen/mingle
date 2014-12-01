@@ -14,6 +14,9 @@ public class ${generatedComponent.name} extends ${baseComponent.fqcn} {
 
     @Override
     protected void onCreate(Bundle savedInstanceState$$0) {
+        if(${principalClass.variableName} == null){
+            ${principalClass.variableName} = new ${principalClass.fqcn}(this);
+        }
         <#list mixinClasses as mixinClass>
         if(${mixinClass.variableName} == null){
             ${mixinClass.variableName} = new ${mixinClass.fqcn}(this);
@@ -32,8 +35,8 @@ public class ${generatedComponent.name} extends ${baseComponent.fqcn} {
         ${lcMethodStatement.variableName}.${lcMethod}();
         </#list>
     }
-    </#list>
 
+    </#list>
     @Override
     protected void onSaveInstanceState(Bundle outState$$0){
         <#list onSaveInstanceStateStatementList as onSaveStmt>

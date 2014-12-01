@@ -12,6 +12,7 @@ import mingle.sample.misc.EventbusMixin;
 public class Main {
 
     public Main(Activity owner){}
+
     @OnCreate
     public void onCreate(Bundle savedInstanceState){
         //Do Some Creating
