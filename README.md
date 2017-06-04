@@ -1,3 +1,5 @@
+## DEPRECATED. Use Android Architecture Components instead ##
+
 #Mingle
 
 `mingle` is a **mixin library** with the goal of reducing boilerplate code in Android applications. It achieves this goal using **compile time annotation processing**. `mingle` promotes the "Favor composition over Inheritance" advice by turning each mixin into an member variable of a class.
